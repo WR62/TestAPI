@@ -1,5 +1,7 @@
 import requests
 
+from tests.model import ListRequestStructure, RequestStructure
+
 
 class HttpClient2Gectaro:
     def __init__(self, base_url, token, project_id):
@@ -50,3 +52,16 @@ class HttpClient2Gectaro:
             f"{self.base_url}/companies/{comp_id}/resource-requests", headers=self.session.headers
         )
         return response
+
+    def get_full_list_of_requests(self):
+        # Получаем список заявок
+        response = self.get_project_request_list()
+        return ListRequestStructure(full_list=response.json())
+
+    def get_id_first_request(self, list_requests) -> int:
+        # По ТЗ разрешено удалять только заявки сверх бюджета
+        # Для теста находим идентификатор первой заявки по порядку
+        for item in list_requests:
+            if item.is_over_budget == 1:
+                return item.id_
+        return 0
